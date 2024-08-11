@@ -14,7 +14,8 @@ const router = express.Router();
 
 // all routes in here are starting with 
 router.post("/", authcheck, create_user_task_middleware, create_user_task )
-router.get("/:project_id", authcheck, get_all_user_tasks_by_project_id )
+router.get("/generate/:project_id", authcheck, get_all_user_tasks_by_project_id )
+router.get("/generate/:project_id/:user_id", authcheck, get_all_user_tasks_by_project_id )
 
 // get_user_task
 
