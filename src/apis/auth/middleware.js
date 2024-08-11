@@ -6,6 +6,7 @@ export const signup_middleware = async (req, res, next) => {
       
       let {first_name, last_name, phone, email, password} = req.body;
       
+      let password_original = password 
       if(!first_name) throw new CustomError("first_name required","02")
       if(!last_name) throw new CustomError("last_name required","02")
       if(!phone) throw new CustomError("phone required","02")
@@ -19,8 +20,11 @@ export const signup_middleware = async (req, res, next) => {
 
 
       for(const key in req.body){
+        // console.log(req.body)
         if(typeof  req.body[key]  == 'string')  req.body[key] = req.body[key].toLowerCase().trim()
       }
+      req.body.password = password_original
+      // console.log(req.body)
       next();
     }
     catch (err) {
