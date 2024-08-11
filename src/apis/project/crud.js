@@ -14,6 +14,15 @@ const project_obj = {
   description: true,
   created_at: true,
   updated_at: true,
+  creator :{
+    select : {
+      first_name:true,
+      last_name:true,
+      email:true,
+      phone:true,
+      profile_photo:true
+    }
+  },
   users: {
     select: {
       role:true,
@@ -30,7 +39,44 @@ const project_obj = {
         }
       }
     }
+  },
+  tasks:{
+    select: {
+      user_id: true,
+      task_id: true,
+      title: true,
+      description: true,
+      status: true,
+      due_date: true,
+      project_id: true,
+      assigned_by_user_entry: true,
+      notes: true,
+      final_status: true,
+      created_at: true,
+      updated_at: true,
+      project: {
+        select: {
+          name: true,
+          description: true
+        }
+      },
+      assigned_by_user: {
+        select: {
+          user: {
+            select: {
+              first_name: true,
+              last_name: true,
+              profile_photo: true,
+              phone: true,
+              email: true
+            }
+          }
+        }
+      },
+      messages: true
+    }
   }
+  
 }
 
 export async function create_project(user_id, name, description, project_id, entry_id) {
