@@ -1,0 +1,91 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id              Int              @id @default(autoincrement())
+  user_id         String           @unique
+  first_name      String
+  last_name       String
+  phone           String           @unique
+  profile_photo   String?
+  email           String           @unique
+  password        String
+  created_at      DateTime         @default(now())
+  updated_at      DateTime         @updatedAt
+  last_login      DateTime?
+  projects        project_x_user[]
+  createdProjects project[]
+  tasks           task[]
+}
+
+model project {
+  id          Int              @id @default(autoincrement())
+  project_id  String           @unique
+  name        String
+  description String?
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @updatedAt
+  creator_id  String // Foreign key to track the user who created the project
+  creator     user             @relation(fields: [creator_id], references: [user_id])
+  users       project_x_user[]
+  tasks       task[]
+}
+
+model project_x_user {
+  entry_id      String         @id @unique
+  user_id       String
+  project_id    String
+  role          String         @default("member") // Role of the user in the project (e.g., "admin", "member")
+  assignedAt    DateTime       @default(now())
+  user          user           @relation(fields: [user_id], references: [user_id])
+  project       project        @relation(fields: [project_id], references: [project_id], onDelete: Cascade) // Cascade delete on project deletion
+  task          task[]
+  task_messages task_message[]
+
+  @@unique([user_id, project_id])
+}
+
+model task {
+  id                     Int            @id @default(autoincrement())
+  task_id                String         @unique
+  title                  String
+  description            String?
+  status                 String         @default("pending") // Example statuses: pending, IN_PROGRESS, COMPLETED
+  due_date               DateTime?
+  user_id                String
+  project_id             String
+  assigned_by_user_entry String
+  final_status           String         @default("pending") // Example statuses: pending, APPROVED, REJECTED
+  created_at             DateTime       @default(now())
+  updated_at             DateTime       @updatedAt
+  user                   user           @relation(fields: [user_id], references: [user_id])
+  project                project        @relation(fields: [project_id], references: [project_id], onDelete: Cascade)
+  assigned_by_user       project_x_user @relation(fields: [assigned_by_user_entry], references: [entry_id])
+  messages               task_message[]
+
+  @@unique([user_id, project_id, title])
+}
+
+model task_message {
+  id                Int            @id @default(autoincrement())
+  message           String
+  task_id           String
+  project_x_user_id String
+  created_at        DateTime       @default(now())
+  task              task           @relation(fields: [task_id], references: [task_id], onDelete: Cascade)
+  project_x_user    project_x_user @relation(fields: [project_x_user_id], references: [entry_id])
+
+  @@unique([task_id, project_x_user_id, created_at])
+}
