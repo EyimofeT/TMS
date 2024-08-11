@@ -53,13 +53,30 @@ export const create_user_task_middleware = async (req, res, next) => {
   }
 };
 
+export const update_user_task_status_middleware = async (req, res, next) => {
+  try {
+    let {task_id, project_id, status } = req.body
 
+    if(!task_id) throw new CustomError("title required","02")
+    if(!project_id) throw new CustomError("project_id required","02")
+    if(!status) throw new CustomError("status required","02")
 
-//   task_id                String         @unique
-//   title                  String
-//   description            String?
-//   status                 String         @default("pending") // Example statuses: pending, IN_PROGRESS, COMPLETED
-//   due_date               DateTime?
-//   user_id                String
-//   project_id             String
-//   assigned_by_user_entry String
+    for(const key in req.body){
+      if(typeof  req.body[key]  == 'string')  req.body[key] = req.body[key].toLowerCase().trim()
+    }
+
+    const valid_status = ["in progress", "completed"];
+    if(!valid_status.includes(status.toLowerCase())) throw new CustomError(`Invalid status value ${status}`, "02");
+    
+
+    next();
+  } catch (err) {
+    return res.status(200).json({
+      code: 400 ,
+      responseCode: err.code ,
+      status: "failed",
+      message: err.message,
+      error: "An Error Occured!",
+    });
+  }
+};

@@ -48,6 +48,7 @@ const project_obj = {
       description: true,
       status: true,
       due_date: true,
+      date_completed :true,
       project_id: true,
       assigned_by_user_entry: true,
       notes: true,

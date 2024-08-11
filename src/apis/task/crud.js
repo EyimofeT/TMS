@@ -88,6 +88,7 @@ export async function read_all_task(where) {
         description: true,
         status: true,
         due_date: true,
+        date_completed :true,
         project_id: true,
         assigned_by_user_entry: true,
         notes: true,
@@ -122,6 +123,26 @@ export async function read_all_task(where) {
   }
   catch (err) {
     console.log("Error while trying to read task: " + err)
+    return false
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+export async function update_task(task_id,project_id,data){
+  try {
+
+    let user_task = await prisma.task.updateMany({
+      where:{
+        task_id,
+        project_id
+      },
+      data
+    })
+    return user_task
+  }
+  catch (err) {
+    console.log("Error while trying to update task: " + err)
     return false
   } finally {
     await prisma.$disconnect();

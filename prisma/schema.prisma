@@ -64,6 +64,7 @@ model task {
   description            String?
   status                 String         @default("pending") // Example statuses: pending, IN_PROGRESS, COMPLETED
   due_date               DateTime?
+  date_completed         DateTime?
   user_id                String
   project_id             String
   assigned_by_user_entry String
