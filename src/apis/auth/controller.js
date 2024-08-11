@@ -106,7 +106,7 @@ export const login = async (req, res) => {
     update_last_login(user.user_id)
     delete user.password
     delete user.id
-    delete user.user_id    
+    // delete user.user_id    
 
     return res.status(200).json({
       code: 200 ,

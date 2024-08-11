@@ -67,6 +67,7 @@ model task {
   user_id                String
   project_id             String
   assigned_by_user_entry String
+  notes                  String?
   final_status           String         @default("pending") // Example statuses: pending, APPROVED, REJECTED
   created_at             DateTime       @default(now())
   updated_at             DateTime       @updatedAt

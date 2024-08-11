@@ -1,10 +1,12 @@
 import express from "express";
 import cors from "cors";
+import moment from "moment";
 import { getenv } from "./src/core/helper.js";
 import authRouter from "./src/apis/auth/routes.js"
 import userRouter from "./src/apis/user/routes.js"
 import projectRouter from "./src/apis/project/routes.js"
 import dashboardRouter from "./src/apis/dashboard/routes.js"
+import taskRouter from "./src/apis/task/routes.js"
 import { is_request_empty } from "./src/apis/utils/utility.js";
 import morgan from "morgan";
 import bodyParser from "body-parser";
@@ -13,6 +15,7 @@ import { CustomError } from "./src/core/customerror.js";
 global.CustomError = CustomError
 global.rd = false
 global.getenv = getenv
+global.moment = moment
 global.is_request_empty = is_request_empty
 
 const app = express();
@@ -48,6 +51,9 @@ app.use(`${getenv("BASE_URL")}project`, projectRouter);
 
 //all dashboard routes
 app.use(`${getenv("BASE_URL")}dashboard`,dashboardRouter);
+
+//all task routes
+app.use(`${getenv("BASE_URL")}task`,taskRouter);
 
 app.get("/", (req, res) => {
   return res.status(200).json({
