@@ -40,8 +40,23 @@ export const create_user_project = async (req, res) => {
     let {name, description} = req.body
     let project_id = crypto.randomUUID()
     let entry_id = crypto.randomUUID()
+    let project_photo
 
-    let project = await create_project(user.user_id, name, description, project_id, entry_id)
+    if(req.files.project_photo){
+      const b64 = Buffer.from(req.files.project_photo[0].buffer).toString("base64");
+    let dataURI = "data:" + req.files.project_photo[0].mimetype + ";base64," + b64;
+    const doc1Result = await cloudinary.uploader.upload(dataURI, {
+      resource_type: 'auto',
+      folder: folderName,
+    });
+    let cloud_image = {
+      "file_name": req.files.project_photo[0].originalname,
+      "file_url": doc1Result.secure_url
+     }
+     project_photo = doc1Result.secure_url
+    }
+
+    let project = await create_project(user.user_id, name, description, project_id, entry_id, project_photo)
     if(!project) throw new CustomError("Something went wrong trying to create project", "09")
 
     return res.status(200).json({

@@ -22,12 +22,14 @@ export const create_user_project_middleware = async (req, res, next) => {
 
     if(!name) throw new CustomError("name required","02")
     if(!description) throw new CustomError("description required","02")
+
+    if(!req.files.project_photo) throw new CustomError("file - project_photo required", "02")
     
   for(const key in req.body){
     if(typeof  req.body[key]  == 'string')  req.body[key] = req.body[key].toLowerCase().trim()
   }
 
-    next();
+    // next();
   } catch (err) {
     return res.status(200).json({
       code: 400 ,

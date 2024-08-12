@@ -31,16 +31,17 @@ model user {
 }
 
 model project {
-  id          Int              @id @default(autoincrement())
-  project_id  String           @unique
-  name        String
-  description String?
-  created_at  DateTime         @default(now())
-  updated_at  DateTime         @updatedAt
-  creator_id  String // Foreign key to track the user who created the project
-  creator     user             @relation(fields: [creator_id], references: [user_id])
-  users       project_x_user[]
-  tasks       task[]
+  id            Int              @id @default(autoincrement())
+  project_photo String?
+  project_id    String           @unique
+  name          String
+  description   String?
+  created_at    DateTime         @default(now())
+  updated_at    DateTime         @updatedAt
+  creator_id    String // Foreign key to track the user who created the project
+  creator       user             @relation(fields: [creator_id], references: [user_id])
+  users         project_x_user[]
+  tasks         task[]
 }
 
 model project_x_user {

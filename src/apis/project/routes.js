@@ -13,7 +13,7 @@ const upload = multer({ storage: storage });
 const router = express.Router();
 
 // all routes in here are starting with  dhata/api/v1/user
-router.post("/", authcheck, create_user_project_middleware, create_user_project)
+router.post("/",upload.fields([{ name: 'project_photo', maxCount: 1 }]), authcheck, create_user_project_middleware, create_user_project)
 router.get("/", authcheck, get_user_project)
 router.get("/:project_id", authcheck, get_user_project_by_project_id)
 

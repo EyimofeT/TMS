@@ -10,6 +10,7 @@ const prisma = new PrismaClient({
 const transaction_timeout = 60000
 const project_obj = {
   project_id: true,
+  project_photo: true,
   name: true,
   description: true,
   created_at: true,
@@ -81,7 +82,7 @@ const project_obj = {
   
 }
 
-export async function create_project(user_id, name, description, project_id, entry_id) {
+export async function create_project(user_id, name, description, project_id, entry_id, photo) {
   try {
 
     const save_data = await prisma.$transaction(async (prisma) => {
@@ -90,7 +91,8 @@ export async function create_project(user_id, name, description, project_id, ent
           project_id,
           name,
           description,
-          creator_id: user_id
+          creator_id: user_id,
+          project_photo : photo || null
         }
       })
 
