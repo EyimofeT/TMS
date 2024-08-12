@@ -53,6 +53,34 @@ export const create_user_task_middleware = async (req, res, next) => {
   }
 };
 
+export const update_user_task_middleware = async (req, res, next) => {
+  try {
+    let {title, description, due_date, notes } = req.body
+
+    if(!title) throw new CustomError("title required","02")
+    if(!description) throw new CustomError("description required","02")
+    if(!status) throw new CustomError("status required","02")
+
+    for(const key in req.body){
+      if(typeof  req.body[key]  == 'string')  req.body[key] = req.body[key].toLowerCase().trim()
+    }
+
+    const valid_status = ["in progress", "completed"];
+    if(!valid_status.includes(status.toLowerCase())) throw new CustomError(`Invalid status value ${status}`, "02");
+    
+
+    next();
+  } catch (err) {
+    return res.status(200).json({
+      code: 400 ,
+      responseCode: err.code ,
+      status: "failed",
+      message: err.message,
+      error: "An Error Occured!",
+    });
+  }
+};
+
 export const update_user_task_status_middleware = async (req, res, next) => {
   try {
     let {task_id, project_id, status } = req.body
@@ -80,3 +108,4 @@ export const update_user_task_status_middleware = async (req, res, next) => {
     });
   }
 };
+

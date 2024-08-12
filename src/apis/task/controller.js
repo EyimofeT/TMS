@@ -200,7 +200,7 @@ export const update_user_task_status = async (req, res) => {
 
     let user_x_project = await read_project_x_user(user.user_id, project_id)
     if(!user_x_project) throw new CustomError("You are not associated with this project", "09")
-    console.log(user_x_project)
+    // console.log(user_x_project)
     // if(user_x_project)
 
 
@@ -222,6 +222,7 @@ export const update_user_task_status = async (req, res) => {
     let task_update_data = {
       status
     }
+    if(status == 'completed') task_update_data.date_completed = new Date()
     let update_task_status = await update_task(task_id, project_id, task_update_data)
     if(!update_task_status) throw new CustomError(`Something went wrong`, "09")
 

@@ -16,6 +16,7 @@ const project_obj = {
   updated_at: true,
   creator :{
     select : {
+      user_id:true,
       first_name:true,
       last_name:true,
       email:true,
