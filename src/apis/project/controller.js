@@ -100,7 +100,7 @@ export const get_user_project = async (req, res) => {
       code: 200 ,
       responseCode: "00",
       status: "success",
-      message: "Project created successfully",
+      message: "Project fetched successfully",
       data: project,
     });
 

@@ -29,7 +29,7 @@ export const create_user_project_middleware = async (req, res, next) => {
     if(typeof  req.body[key]  == 'string')  req.body[key] = req.body[key].toLowerCase().trim()
   }
 
-    // next();
+    next();
   } catch (err) {
     return res.status(200).json({
       code: 400 ,
