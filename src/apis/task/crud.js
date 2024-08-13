@@ -98,13 +98,15 @@ export async function read_all_task(where) {
         project: {
           select: {
             name: true,
-            description: true
+            description: true,
+            project_photo:true
           }
         },
         assigned_by_user: {
           select: {
             user: {
               select: {
+                user_id:true,
                 first_name: true,
                 last_name: true,
                 profile_photo: true,

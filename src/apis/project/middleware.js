@@ -96,3 +96,33 @@ export const delete_user_project_middleware = async (req, res, next) => {
     });
   }
 }
+
+export const update_user_project_middleware = async (req, res, next) => {
+  try {
+    const allowedKeys = [
+      "project_photo",
+      "name",
+      "description",
+    ]
+    for (const key in req.body) {
+      if (!allowedKeys.includes(key)) {
+        delete req.body[key];
+      }
+    }
+
+    for (const key in req.body) {
+      if (typeof req.body[key] == 'string') req.body[key] = req.body[key].toLowerCase().trim()
+    }
+
+    
+    next();
+  } catch (err) {
+    return res.status(200).json({
+      code: 400,
+      responseCode: err.code,
+      status: "failed",
+      message: err.message,
+      error: "An Error Occured!",
+    });
+  }
+};
