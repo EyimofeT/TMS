@@ -348,3 +348,98 @@ export const update_user_task = async (req, res) => {
 
   }
 }
+
+export const delete_user_task = async (req, res) => {
+  try {
+
+    let token = req.headers.authorization;
+    token = token.split(" ")[1];
+
+    let token_data = await isTokenValid(token)
+    if (!token_data) throw new CustomError("Access Denied", "08")
+    let user_id = token_data.user_id
+
+    let user = await get_user_account_by_id(user_id)
+    if (!user) throw new CustomError("Something went wrong", "09")
+
+    let { task_id, project_id } = req.params
+    if (!task_id || task_id == undefined || task_id == "") throw new CustomError("Invalid task/task_id supplied", "09")
+    if (!project_id || project_id == undefined || project_id == "") throw new CustomError("Invalid project/project_id supplied", "09")
+
+    let user_x_project = await read_project_x_user(user.user_id, project_id)
+    if (!user_x_project) throw new CustomError("You are not associated with this project", "09")
+
+    let task_where = {
+      task_id,
+      project_id
+    }
+
+    let tasks = await read_all_task(task_where)
+    if (tasks.length < 1) throw new CustomError("Unable to find task", "09")
+    tasks = tasks[0]
+
+    // console.log(task_where)
+    // console.log(user_x_project)
+    // console.log(tasks)
+
+    if (!is_user_admin(user_x_project.role) && user.user_id != user_x_project.project.creator_id) throw new CustomError("You are not authorized to perform the action", "09")
+
+    let task_update_data = {
+      ...req.body
+    }
+
+    if (req.body.user_id) {
+      if (!await read_project_x_user(user.user_id, project_id)) throw new CustomError("New user not associated with this project", "09")
+    }
+
+    if (req.body.status) {
+      if (req.body.status == 'pending' || req.body.status == 'in progress') {
+        task_update_data.final_status = 'pending'
+        task_update_data.date_completed = null
+      }
+    }
+    if (req.body.final_status) {
+      if (req.body.final_status == 'completed') {
+        task_update_data.status = 'completed'
+        task_update_data.date_completed = new Date()
+      }
+    }
+
+
+    //   "user_id",
+    //   "title",
+    //   "description",
+    //   "due_date",
+    //   "notes",
+    //   "status",
+    //   "final_status"
+
+    let update_task_status = await update_task(task_id, project_id, task_update_data)
+    if(!update_task_status) throw new CustomError(`Something went wrong`, "09")
+
+    //Fetch task again
+    tasks = await read_all_task(task_where)
+    if (!tasks) throw new CustomError("Something went wrong", "09")
+    tasks = tasks[0]
+
+    return res.status(200).json({
+      code: 200,
+      responseCode: "00",
+      status: "success",
+      message: "Task updated successfully",
+      data: tasks,
+    });
+
+  }
+  catch (err) {
+    return res.status(200).json({
+      code: 400,
+      responseCode: err.code,
+      status: "failed",
+      message: err.message,
+      error: "An Error Occured!",
+    });
+  } finally {
+
+  }
+}

@@ -77,6 +77,9 @@ const project_obj = {
         }
       },
       messages: true
+    },
+    orderBy : {
+      created_at : "desc"
     }
   }
   
