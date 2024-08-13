@@ -19,7 +19,7 @@ router.get("/generate/:project_id", authcheck, get_all_user_tasks_by_project_id 
 router.patch("/interface/:project_id/:task_id", authcheck, update_user_task_middleware , update_user_task)
 router.patch("/status", authcheck, update_user_task_status_middleware, update_user_task_status)
 
-router.delete("/interface/:task_id", authcheck, delete_user_task)
+router.delete("/interface/:project_id/:task_id", authcheck, delete_user_task)
 
 
 

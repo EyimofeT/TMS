@@ -4,7 +4,7 @@ import { isTokenValid } from "../auth/helper.js";
 import { get_user_account_by_id } from "../user/crud.js";
 import { read_project_x_user, read_user_project_by_user_id, read_user_project_by_user_id_project_id } from "../project/crud.js";
 import multer from 'multer';
-import { create_task, read_all_task, update_task } from './crud.js'
+import { create_task, delete_task, read_all_task, update_task } from './crud.js'
 import { v2 as cloudinary } from 'cloudinary';
 import { is_user_admin } from "../role/helper.js";
 import crypto from "crypto";
@@ -378,56 +378,19 @@ export const delete_user_task = async (req, res) => {
     if (tasks.length < 1) throw new CustomError("Unable to find task", "09")
     tasks = tasks[0]
 
-    // console.log(task_where)
-    // console.log(user_x_project)
-    // console.log(tasks)
 
     if (!is_user_admin(user_x_project.role) && user.user_id != user_x_project.project.creator_id) throw new CustomError("You are not authorized to perform the action", "09")
 
-    let task_update_data = {
-      ...req.body
-    }
+    let delete_task_status = await delete_task(task_id, project_id)
+    if(!delete_task_status) throw new CustomError(`Something went wrong`, "09")
 
-    if (req.body.user_id) {
-      if (!await read_project_x_user(user.user_id, project_id)) throw new CustomError("New user not associated with this project", "09")
-    }
-
-    if (req.body.status) {
-      if (req.body.status == 'pending' || req.body.status == 'in progress') {
-        task_update_data.final_status = 'pending'
-        task_update_data.date_completed = null
-      }
-    }
-    if (req.body.final_status) {
-      if (req.body.final_status == 'completed') {
-        task_update_data.status = 'completed'
-        task_update_data.date_completed = new Date()
-      }
-    }
-
-
-    //   "user_id",
-    //   "title",
-    //   "description",
-    //   "due_date",
-    //   "notes",
-    //   "status",
-    //   "final_status"
-
-    let update_task_status = await update_task(task_id, project_id, task_update_data)
-    if(!update_task_status) throw new CustomError(`Something went wrong`, "09")
-
-    //Fetch task again
-    tasks = await read_all_task(task_where)
-    if (!tasks) throw new CustomError("Something went wrong", "09")
-    tasks = tasks[0]
 
     return res.status(200).json({
       code: 200,
       responseCode: "00",
       status: "success",
-      message: "Task updated successfully",
-      data: tasks,
+      message: "Task deleted successfully",
+      data :tasks
     });
 
   }

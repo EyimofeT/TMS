@@ -153,3 +153,22 @@ export async function update_task(task_id,project_id,data){
     await prisma.$disconnect();
   }
 }
+
+export async function delete_task(task_id,project_id){
+  try {
+
+    let user_task = await prisma.task.deleteMany({
+      where:{
+        task_id,
+        project_id
+      }
+    })
+    return user_task
+  }
+  catch (err) {
+    console.log("Error while trying to delete task: " + err)
+    return false
+  } finally {
+    await prisma.$disconnect();
+  }
+}
