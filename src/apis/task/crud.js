@@ -117,6 +117,9 @@ export async function read_all_task(where) {
           }
         },
         messages: true
+      },
+      orderBy : {
+        created_at : "desc"
       }
     })
 
