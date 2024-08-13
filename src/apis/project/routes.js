@@ -18,7 +18,7 @@ router.get("/", authcheck, get_user_project)
 router.get("/:project_id", authcheck, get_user_project_by_project_id)
 router.patch("/:project_id",upload.fields([{ name: 'project_photo', maxCount: 1 }]),authcheck, update_user_project_middleware,update_user_project )
 router.post("/interface/user",authcheck,add_user_project_middleware, add_user_project )
-// router.delete("/interface/user", authcheck,delete_user_project_middleware, delete_user_project )
+router.delete("/interface/user", authcheck,delete_user_project_middleware, delete_user_project )
 
 
 
