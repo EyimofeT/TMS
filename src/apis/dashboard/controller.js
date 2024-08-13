@@ -5,6 +5,7 @@ import { get_user_account_by_id } from "../user/crud.js";
 import multer from 'multer';
 import {} from './crud.js'
 import { v2 as cloudinary } from 'cloudinary'; 
+import { task_data } from "../task/crud.js";
 cloudinary.config({ 
   cloud_name: getenv("CLOUDINARY_CLOUD_NAME"), 
   api_key: getenv("CLOUDINARY_API_KEY"), 
@@ -33,9 +34,13 @@ export const get_dashboard = async (req, res) => {
     let user = await get_user_account_by_id(user_id)
     if(!user) throw new CustomError("Something went wrong", "09")
 
+    
     let dashboard_data = {
-      data : true
+      user_id : user.user_id
     }
+
+    let user_task_data = await task_data(user.user_id)
+    dashboard_data.task_data = user_task_data
 
     return res.status(200).json({
       code: 200 ,

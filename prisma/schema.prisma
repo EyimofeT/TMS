@@ -14,34 +14,60 @@ datasource db {
 }
 
 model user {
-  id              Int              @id @default(autoincrement())
-  user_id         String           @unique
+  id              Int               @id @default(autoincrement())
+  user_id         String            @unique
   first_name      String
   last_name       String
-  phone           String           @unique
+  phone           String            @unique
   profile_photo   String?
-  email           String           @unique
+  email           String            @unique
   password        String
-  created_at      DateTime         @default(now())
-  updated_at      DateTime         @updatedAt
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
   last_login      DateTime?
   projects        project_x_user[]
   createdProjects project[]
   tasks           task[]
+  project_message project_message[]
 }
 
 model project {
-  id            Int              @id @default(autoincrement())
-  project_photo String?
-  project_id    String           @unique
-  name          String
-  description   String?
-  created_at    DateTime         @default(now())
-  updated_at    DateTime         @updatedAt
-  creator_id    String // Foreign key to track the user who created the project
-  creator       user             @relation(fields: [creator_id], references: [user_id])
-  users         project_x_user[]
-  tasks         task[]
+  id              Int               @id @default(autoincrement())
+  project_photo   String?
+  project_id      String            @unique
+  name            String
+  description     String?
+  created_at      DateTime          @default(now())
+  updated_at      DateTime          @updatedAt
+  creator_id      String // Foreign key to track the user who created the project
+  creator         user              @relation(fields: [creator_id], references: [user_id])
+  users           project_x_user[]
+  tasks           task[]
+  project_message project_message[]
+}
+
+// model project_message {
+//   id                Int               @id @default(autoincrement())
+//   message           String
+//   project_id        String
+//   user_id           String
+//   created_at        DateTime          @default(now())
+//   updated_at        DateTime          @updatedAt
+//   user              user              @relation(fields: [user_id], references: [user_id])
+//   project           project           @relation(fields: [project_id], references: [project_id])
+//   parent_message_id Int? // For threaded messages (replies to other messages)
+//   parent_message    project_message?  @relation("ThreadedMessages", fields: [parent_message_id], references: [id])
+//   replies           project_message[] @relation("ThreadedMessages")
+// }
+model project_message {
+  id                Int               @id @default(autoincrement())
+  message           String
+  project_id        String
+  user_id           String
+  created_at        DateTime          @default(now())
+  updated_at        DateTime          @updatedAt
+  user              user              @relation(fields: [user_id], references: [user_id])
+  project           project           @relation(fields: [project_id], references: [project_id])
 }
 
 model project_x_user {
