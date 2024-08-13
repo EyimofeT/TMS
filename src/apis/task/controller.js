@@ -7,6 +7,7 @@ import multer from 'multer';
 import { create_task, read_all_task, update_task } from './crud.js'
 import { v2 as cloudinary } from 'cloudinary';
 import { is_user_admin } from "../role/helper.js";
+import crypto from "crypto";
 cloudinary.config({
   cloud_name: getenv("CLOUDINARY_CLOUD_NAME"),
   api_key: getenv("CLOUDINARY_API_KEY"),
