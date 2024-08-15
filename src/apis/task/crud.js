@@ -27,7 +27,24 @@ let task_obj = {
     select: {
       name: true,
       description: true,
-      project_photo:true
+      project_photo:true,
+      users: {
+        select: {
+          role:true,
+          entry_id:true,
+          assignedAt:true,
+          user: {
+            select: {
+              user_id:true,
+              first_name: true,
+              last_name: true,
+              email: true,
+              phone: true,
+              profile_photo: true
+            }
+          }
+        }
+      }
     }
   },
   assigned_by_user: {
