@@ -131,6 +131,40 @@ export const get_user_task = async (req, res) => {
   }
 }
 
+export const get_all_user_task = async (req, res) => {
+  try {
+
+    let token = req.headers.authorization;
+    token = token.split(" ")[1];
+
+    let token_data = await isTokenValid(token)
+    if (!token_data) throw new CustomError("Access Denied", "08")
+    let user_id = token_data.user_id
+
+    let tasks  = await read_all_task({user_id: user_id}) 
+
+    return res.status(200).json({
+      code: 200,
+      responseCode: "00",
+      status: "success",
+      message: "Task fetched successfully",
+      data: tasks,
+    });
+
+  }
+  catch (err) {
+    return res.status(200).json({
+      code: 400,
+      responseCode: err.code,
+      status: "failed",
+      message: err.message,
+      error: "An Error Occured!",
+    });
+  } finally {
+
+  }
+}
+
 export const get_all_user_tasks_by_project_id = async (req, res) => {
   try {
 
