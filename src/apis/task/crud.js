@@ -1,6 +1,6 @@
 import { getenv } from "../../core/helper.js";
 import { PrismaClient } from "@prisma/client";
-import { startOfWeek, endOfWeek } from 'date-fns';
+import { startOfWeek, endOfWeek , eachDayOfInterval, format } from 'date-fns';
 const prisma = new PrismaClient({
   datasources: {
     db: {
@@ -221,9 +221,9 @@ try {
   let due_tasks = await prisma.task.findMany({
     where:{
       user_id,
-      due_date: {
-        gt: current_date, // Only tasks with a due_date greater than the current date
-      },
+      // due_date: {
+      //   gt: current_date, // Only tasks with a due_date greater than the current date
+      // },
       status: {
         not: 'completed', // Exclude tasks where status is 'COMPLETED'
       },
@@ -240,27 +240,29 @@ const end_of_current_week = endOfWeek(current_date, { weekStartsOn: 0 });
 
 const completed_tasks_count = await prisma.task.count({
   where: {
+    user_id,
     status: 'completed',
-    OR: [
-      {
-        date_completed: {
-          gte: start_of_current_week,
-          lte: end_of_current_week,
-        },
-      },
-      {
-        date_completed: null,
-        due_date: {
-          gte: start_of_current_week,
-          lte: end_of_current_week,
-        },
-      },
-    ],
+    // OR: [
+    //   {
+    //     date_completed: {
+    //       gte: start_of_current_week,
+    //       lte: end_of_current_week,
+    //     },
+    //   },
+    //   {
+    //     date_completed: null,
+    //     due_date: {
+    //       gte: start_of_current_week,
+    //       lte: end_of_current_week,
+    //     },
+    //   },
+    // ],
   },
 });
 
 const tasks_due_this_week_count = await prisma.task.count({
   where: {
+    user_id,
     status: {
       not: 'completed', // Exclude tasks where status is 'COMPLETED'
     },
@@ -271,7 +273,39 @@ const tasks_due_this_week_count = await prisma.task.count({
   },
 });
 
-  return {total_number_of_task, total_number_of_pending_task, total_number_of_in_progress_task, total_number_of_completed_task,due_tasks, completed_tasks_count, tasks_due_this_week_count}
+//BETA
+// Fetch tasks completed this week
+const task_completed = await prisma.task.findMany({
+  where: {
+    user_id,
+    date_completed: {
+      gte: start_of_current_week,
+      lte: end_of_current_week,
+    },
+  },
+});
+
+// console.log(task_completed)
+
+// Create an object to store the counts for each day
+const task_complete_count_by_day = eachDayOfInterval({ start: start_of_current_week, end: current_date }).reduce(
+  (acc, date) => {
+    const day = format(date, 'EEEE').toLowerCase(); // Get the day of the week (e.g., 'monday')
+    acc[day] = 0; // Initialize count for the day
+    return acc;
+  },
+  {}
+);
+
+ // Count the number of tasks completed on each day
+ task_completed.forEach(task => {
+  const day_completed = format(task.date_completed, 'EEEE').toLowerCase();
+  if (task_complete_count_by_day[day_completed] !== undefined) {
+    task_complete_count_by_day[day_completed] += 1;
+  }
+});
+
+  return {total_number_of_task, total_number_of_pending_task, total_number_of_in_progress_task, total_number_of_completed_task,due_tasks, completed_tasks_count, tasks_due_this_week_count, task_complete_count_by_day}
 }
 catch (err) {
   console.log("Error while trying to get task data: " + err)
