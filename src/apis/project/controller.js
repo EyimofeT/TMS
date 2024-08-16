@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { get_user_account_by_id, update_user_by_id } from "../user/crud.js";
 import { isTokenValid } from "../auth/helper.js";
 import multer from 'multer';
-import { add_user_to_project, create_project, read_project_x_user, read_user_project_by_user_id, read_user_project_by_user_id_project_id, delete_user_from_project, update_project } from './crud.js'
+import { add_user_to_project, create_project, read_project_x_user, read_user_project_by_user_id, read_user_project_by_user_id_project_id, delete_user_from_project, update_project, update_project_x_user } from './crud.js'
 import { v2 as cloudinary } from 'cloudinary';
 import { is_user_admin } from "../role/helper.js";
 cloudinary.config({
@@ -347,6 +347,87 @@ export const update_user_project = async (req, res) => {
       responseCode: "00",
       status: "success",
       message: "Project updated successfully",
+      data: update,
+    });
+
+  }
+  catch (err) {
+    return res.status(200).json({
+      code: 400,
+      responseCode: err.code,
+      status: "failed",
+      message: err.message,
+      error: "An Error Occured!",
+    });
+  } finally {
+
+  }
+}
+
+export const update_user_role_in_project = async (req, res) => {
+  try {
+
+    let token = req.headers.authorization;
+    token = token.split(" ")[1];
+
+    let token_data = await isTokenValid(token)
+    if (!token_data) throw new CustomError("Access Denied", "08")
+    let active_user_id = token_data.user_id
+
+    let user = await get_user_account_by_id(active_user_id)
+    if (!user) throw new CustomError("Something went wrong", "09")
+
+    let { project_id, user_id, role } = req.body
+  
+    let user_x_project = await read_project_x_user(user.user_id, project_id)
+    if (!user_x_project) throw new CustomError("You are not associated with this project", "09")
+
+    // console.log("role - admin", role == 'admin')
+    // console.log("role - member", role == 'member')
+
+    if (role == 'admin' && !is_user_admin(user_x_project.role) && user.user_id != user_x_project.project.creator_id) throw new CustomError("You are not authorized to perform the action", "09")
+    if (role == 'member' &&  user.user_id != user_x_project.project.creator_id) throw new CustomError("You are not authorized to perform the action", "09")
+   
+    // console.log(await read_project_x_user(user_id, project_id))
+    let current_entry = await read_project_x_user(user_id, project_id) 
+    if(!current_entry) throw new CustomError("User not associated with this project", "09")
+    if(current_entry.role == role) throw new CustomError(`User is already a(n) ${role}`, "09")
+
+    // {
+    //   entry_id: '05d85950-142a-4f4a-91cb-d879f60ec7e3',
+    //   user_id: 'ef2c2467-60dc-4c4a-9460-5c15d9e20e2b',
+    //   project_id: 'fa3ca993-7c0e-48c7-8577-80c855735464',
+    //   role: 'member',
+    //   assignedAt: 2024-08-12T19:17:42.681Z,
+    //   project: {
+    //     id: 5,
+    //     project_photo: 'https://res.cloudinary.com/dp1cc2ste/image/upload/v1723538921/TMS/qjcwgd2l60xsb0euqxch.jpg',
+    //     project_id: 'fa3ca993-7c0e-48c7-8577-80c855735464',
+    //     name: 'issie',
+    //     description: 'train issie on how to behave',
+    //     created_at: 2024-08-12T19:13:59.986Z,
+    //     updated_at: 2024-08-13T08:48:43.698Z,
+    //     creator_id: '553467b3-972e-4bbd-a289-0c526c2dbadc'
+    //   }
+    // }
+
+    let where_data = {
+      entry_id :current_entry.entry_id,
+      project_id, 
+      user_id
+    }
+    let update_data = {
+      role
+    }
+    let update = await update_project_x_user(where_data,update_data)
+    if(!update) throw new CustomError("Something went wrong", "09")
+
+
+    return res.status(200).json({
+      code: 200,
+      responseCode: "00",
+      status: "success",
+      message: "Role updated successfully",
       data: update,
     });
 

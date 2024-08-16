@@ -253,6 +253,23 @@ export async function delete_user_from_project(user_id, project_id){
 
 }
 
+export async function update_project_x_user(where, data){
+  try {
+
+    let user_data = await prisma.project_x_user.update({
+      where,
+      data
+    })
+    return user_data
+  }
+  catch (err) {
+    console.log("Error while trying to update project_x_user: " + err)
+    return false
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function update_project(project_id,data){
   try {
 
