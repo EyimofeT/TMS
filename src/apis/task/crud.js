@@ -297,6 +297,7 @@ const task_complete_count_by_day = eachDayOfInterval({ start: start_of_current_w
   {}
 );
 
+console.log(task_complete_count_by_day)
  // Count the number of tasks completed on each day
  task_completed.forEach(task => {
   const day_completed = format(task.date_completed, 'EEEE').toLowerCase();
