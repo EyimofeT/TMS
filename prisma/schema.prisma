@@ -59,16 +59,25 @@ model project {
 //   parent_message    project_message?  @relation("ThreadedMessages", fields: [parent_message_id], references: [id])
 //   replies           project_message[] @relation("ThreadedMessages")
 // }
+
 model project_message {
-  id                Int               @id @default(autoincrement())
-  message           String
-  project_id        String
-  user_id           String
-  created_at        DateTime          @default(now())
-  updated_at        DateTime          @updatedAt
-  user              user              @relation(fields: [user_id], references: [user_id])
-  project           project           @relation(fields: [project_id], references: [project_id])
+  id                         Int                          @id @default(autoincrement())
+  message                    String
+  project_id                 String
+  user_id                    String
+  created_at                 DateTime                     @default(now())
+  updated_at                 DateTime                     @updatedAt
+  user                       user                         @relation(fields: [user_id], references: [user_id])
+  project                    project                      @relation(fields: [project_id], references: [project_id])
+
 }
+
+  // project_message_attachment project_message_attachment[]
+// model project_message_attachment {
+//   id              Int             @unique
+//   attachment      String?
+//   project_message project_message @relation(fields: [id], references: [id])
+// }
 
 model project_x_user {
   entry_id      String         @id @unique

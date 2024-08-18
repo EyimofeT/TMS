@@ -6,7 +6,7 @@ import { PrismaClient } from "@prisma/client";
 import { get_user_account_by_id, update_user_by_id } from "../user/crud.js";
 import { isTokenValid } from "../auth/helper.js";
 import multer from 'multer';
-import { add_user_to_project, create_project, read_project_x_user, read_user_project_by_user_id, read_user_project_by_user_id_project_id, delete_user_from_project, update_project, update_project_x_user } from './crud.js'
+import { add_user_to_project, create_project, read_project_x_user, read_user_project_by_user_id, read_user_project_by_user_id_project_id, delete_user_from_project, update_project, update_project_x_user, delete_project_all } from './crud.js'
 import { v2 as cloudinary } from 'cloudinary';
 import { is_user_admin } from "../role/helper.js";
 cloudinary.config({
@@ -296,6 +296,55 @@ export const delete_user_project = async (req, res) => {
 
   }
 }
+export const delete_project = async (req, res) => {
+  try {
+
+    let token = req.headers.authorization;
+    token = token.split(" ")[1];
+
+    let token_data = await isTokenValid(token)
+    if (!token_data) throw new CustomError("Access Denied", "08")
+    let user_id = token_data.user_id
+
+    let user = await get_user_account_by_id(user_id)
+    if (!user) throw new CustomError("Something went wrong", "09")
+
+    let {project_id} = req.params
+
+    let project = await read_project_x_user(user.user_id, project_id)
+    if (!project) throw new CustomError("Unabe to associate your account with the specified project", "09")
+
+    let project_owner_id = project.project.creator_id
+    let is_project_owner = user.user_id == project_owner_id
+
+    if ( !is_project_owner) throw new CustomError("You do not have required permissions to perform this action", "09")
+
+
+    let delete_status = await delete_project_all(project_id)
+    if (!delete_status) throw new CustomError("Something went wrong while trying to delete user from project", "09")
+
+
+    return res.status(200).json({
+      code: 200,
+      responseCode: "00",
+      status: "success",
+      message: "Project deleted successfully",
+      data: delete_status,
+    });
+
+  } catch (err) {
+    return res.status(200).json({
+      code: 400,
+      responseCode: err.code,
+      status: "failed",
+      message: err.message,
+      error: "An Error Occured!",
+    });
+  } finally {
+
+  }
+}
+
 
 export const update_user_project = async (req, res) => {
   try {

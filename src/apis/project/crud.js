@@ -288,3 +288,23 @@ export async function update_project(project_id,data){
     await prisma.$disconnect();
   }
 }
+
+
+export async function delete_project_all(project_id){
+  try{
+
+    let project_data = await prisma.project.deleteMany({
+      where:{
+        project_id
+      }
+    })
+      return project_data
+  }
+  catch (err) {
+    console.log("Error while trying to delete project: " + err)
+    return false
+  } finally {
+    await prisma.$disconnect();
+  }
+
+}

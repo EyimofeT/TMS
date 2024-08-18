@@ -7,6 +7,7 @@ import userRouter from "./src/apis/user/routes.js"
 import projectRouter from "./src/apis/project/routes.js"
 import dashboardRouter from "./src/apis/dashboard/routes.js"
 import taskRouter from "./src/apis/task/routes.js"
+import messageRouter from "./src/apis/message/routes.js"
 import { is_request_empty } from "./src/apis/utils/utility.js";
 import morgan from "morgan";
 import bodyParser from "body-parser";
@@ -54,6 +55,8 @@ app.use(`${getenv("BASE_URL")}dashboard`,dashboardRouter);
 
 //all task routes
 app.use(`${getenv("BASE_URL")}task`,taskRouter);
+
+app.use(`${getenv("BASE_URL")}message`,messageRouter);
 
 app.get("/", (req, res) => {
   return res.status(200).json({
