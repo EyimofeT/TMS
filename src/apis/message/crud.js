@@ -66,6 +66,7 @@ export async function read_message_by_project_id(project_id) {
             }
         })
 
+        if(group_message.length > 0){
         for(let message of group_message){
             // console.log(message)
             message.project.creator_id == message.user_id? message.is_creator = true : message.is_creator = false
@@ -79,6 +80,7 @@ export async function read_message_by_project_id(project_id) {
                 }
             })).role
         }
+    }
 
         //   console.log(group_message)
         return group_message
@@ -174,6 +176,23 @@ export async function read_all_user_group_message(user_id) {
             }
         })
 
+        for(let message of messages){
+            if(message.project_message.length < 1) continue
+            console.log(message)
+            let creator_id = message.creator.user_id
+            for(let p_message of message.project_message ){
+                p_message.user_id ==creator_id ? p_message.is_creator = true : p_message.is_creator = false
+                p_message.role = (await prisma.project_x_user.findFirst({
+                    where:{
+                        user_id:p_message.user_id,
+                        project_id:p_message.project_id
+                    },
+                    select:{
+                        role:true
+                    }
+                })).role
+            }
+        }
 
         return messages
     }
