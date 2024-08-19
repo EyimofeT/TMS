@@ -50,7 +50,14 @@ export async function read_message_by_project_id(project_id) {
                 project: {
                     select: {
                         name: true,
-                        description: true
+                        description: true,
+                        creator_id:true,
+                        // users:{
+                        //     select :{
+                        //         user_id:true,
+                        //         role:true
+                        //     }
+                        // }    
                     }
                 }
             },
@@ -58,6 +65,20 @@ export async function read_message_by_project_id(project_id) {
                 created_at: "desc"
             }
         })
+
+        for(let message of group_message){
+            // console.log(message)
+            message.project.creator_id == message.user_id? message.is_creator = true : message.is_creator = false
+            message.role = (await prisma.project_x_user.findFirst({
+                where:{
+                    user_id:message.user_id,
+                    project_id:message.project_id
+                },
+                select:{
+                    role:true
+                }
+            })).role
+        }
 
         //   console.log(group_message)
         return group_message
