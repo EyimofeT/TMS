@@ -3,7 +3,7 @@ import {
   authcheck, project_group_message_middleware
 } from "./middleware.js";
 import {
-    project_group_message, read_all_project_message
+    project_group_message, read_all_project_message, read_all_group_messages
  } from "./controller.js";
 // import { verify } from "jsonwebtoken";
 import multer from "multer";
@@ -15,6 +15,8 @@ const router = express.Router();
 // all routes in here are starting with 
 router.post("/group", authcheck, project_group_message_middleware, project_group_message )
 router.get("/group/:project_id", authcheck, read_all_project_message )
+
+router.get("/group",authcheck,read_all_group_messages )
 
 
 
