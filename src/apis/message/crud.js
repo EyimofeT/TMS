@@ -142,6 +142,7 @@ export async function read_all_user_group_message(user_id) {
                 }
             },
             select: {
+                project_id: true,
                 project_photo:true,
                 name:true,
                 description:true,
@@ -178,7 +179,7 @@ export async function read_all_user_group_message(user_id) {
 
         for(let message of messages){
             if(message.project_message.length < 1) continue
-            console.log(message)
+            // console.log(message)
             let creator_id = message.creator.user_id
             for(let p_message of message.project_message ){
                 p_message.user_id ==creator_id ? p_message.is_creator = true : p_message.is_creator = false
