@@ -101,7 +101,7 @@ export const patch_user = async (req, res) => {
     // console.log(update_data)
 
   delete user.password
-  delete user.user_id
+  // delete user.user_id
 
     return res.status(200).json({
       code: 200 ,
