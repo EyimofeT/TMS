@@ -92,7 +92,7 @@ export const update_user_task_middleware = async (req, res, next) => {
     }
     if (req.body.due_date) {
       let due_date = req.body.due_date
-      if (!moment(due_date, moment.ISO_8601, true).isValid()) throw new CustomError("Invalid date format. Use Datetime format.", "04");
+      // if (!moment(due_date, moment.ISO_8601, true).isValid()) throw new CustomError("Invalid date format. Use Datetime format.", "04");
       const input_date = new Date(due_date);
       if (input_date < new Date()) throw new CustomError("due date cannot be less than current date", "02");
       req.body.due_date = input_date

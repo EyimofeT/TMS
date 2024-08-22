@@ -1,6 +1,7 @@
 
 export const authcheck = async (req, res, next) => {
   try {
+    console.log(req.headers)
     let token = req.headers.authorization;
     if (!token) throw new CustomError("Authentication token required","05");
     next();
