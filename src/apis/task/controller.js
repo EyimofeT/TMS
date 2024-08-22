@@ -352,6 +352,8 @@ export const update_user_task = async (req, res) => {
     //   "notes",
     //   "status",
     //   "final_status"
+    console.log("data : ") 
+    console.log(task_update_data)
 
     let update_task_status = await update_task(task_id, project_id, task_update_data)
     if(!update_task_status) throw new CustomError(`Something went wrong`, "09")
